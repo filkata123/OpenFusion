@@ -66,6 +66,7 @@ public:
     BuffClass maxClass();
 
     int getValue(BuffValueSelector selector);
+    int firstStackTicks(); // duration ticks left on the first stack, -1 if none (stepped-mode STATE)
     EntityRef getLastSource();
 
     /* 

@@ -346,7 +346,8 @@ std::string CNShardServer::dumpState() {
     for (size_t i = 0; i < mobs.size(); i++) {
         Mob* m = mobs[i];
         out << (i ? ";" : "") << m->id << ":" << aiStateCode(m->state) << ":" << m->x << ":" << m->y << ":" << m->hp
-            << ":" << m->nextAttack << ":" << m->nextMovement << ":" << m->skillStyle << ":" << m->hitX << ":" << m->hitY;
+            << ":" << m->nextAttack << ":" << m->nextMovement << ":" << m->skillStyle << ":" << m->hitX << ":" << m->hitY
+            << ":" << (m->hasBuff(ECSB_BOUNDINGBALL) ? m->getBuff(ECSB_BOUNDINGBALL)->firstStackTicks() : -1);
     }
     return out.str();
 }

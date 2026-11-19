@@ -28,7 +28,9 @@
  *                           from the centre (the first is the leader), reseed the RNG and
  *                           re-phase the timers so they count from the reset.
  *                           -> OK <virtual ms> <packets sent to the player>
- *   STATE                   privileged dump of the player and the mobs in its instance,
+ *   STATE                   privileged dump of the player and the mobs in its instance
+ *                           (per mob: id:state:x:y:hp:nextAttack:nextMovement:skillStyle:hitX:hitY:
+ *                           bounding-ball duration ticks left or -1),
  *                           for tests and Twin Gap diagnostics only. Never for an acting
  *                           policy (ff-agent ADR 0001).
  *

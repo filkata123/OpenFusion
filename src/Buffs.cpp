@@ -22,6 +22,10 @@ void Buff::tick(time_t currTime) {
     }
 }
 
+int Buff::firstStackTicks() {
+    return stacks.empty() ? -1 : stacks.front().durationTicks;
+}
+
 void Buff::combatTick(time_t currTime) {
     if(onCombatTick) onCombatTick(self, this, currTime);
 }
