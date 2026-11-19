@@ -4,6 +4,8 @@
 
 #include <map>
 #include <list>
+#include <sstream>
+#include <string>
 
 #define REGISTER_SHARD_PACKET(pactype, handlr) CNShardServer::ShardPackets[pactype] = handlr;
 #define REGISTER_SHARD_TIMER(handlr, delta) CNShardServer::Timers.push_back(TimerEvent(handlr, delta));
@@ -17,6 +19,18 @@ private:
     static void keepAliveTimer(CNServer*, time_t);
     static void periodicSaveTimer(CNServer* serv, time_t currTime);
     static void periodicItemExpireTimer(CNServer* serv, time_t currTime);
+
+    // stepped mode (servers/Stepped.hpp, servers/Stepped.cpp)
+    SOCKET controlListener = -1;
+    SOCKET controlSock = -1;
+    std::string controlBuf;
+    bool handleControlSocket(int i);
+    std::string handleControlCommand(const std::string& line);
+    bool drainClientPackets(uint64_t target);
+    void runTimers(time_t currTime);
+    std::string stepTicks(int ticks, uint64_t target);
+    std::string resetEpisode(std::istringstream& args);
+    std::string dumpState();
 
 public:
     static std::map<uint32_t, PacketHandler> ShardPackets;

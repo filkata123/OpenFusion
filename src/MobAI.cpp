@@ -1,4 +1,5 @@
 #include "MobAI.hpp"
+#include "settings.hpp"
 
 #include "Chunking.hpp"
 #include "NPCManager.hpp"
@@ -802,7 +803,8 @@ void MobAI::onDeath(CombatNPC* npc, EntityRef src) {
     self->killedTime = getTime(); // XXX: maybe introduce a shard-global time for each step?
 
     // check for the edge case where hitting the mob did not aggro it
-    if (src.kind == EntityKind::PLAYER && src.isValid()) {
+    // (stepped mode: no drops and no mission progress, so Episodes stay identical)
+    if (src.kind == EntityKind::PLAYER && src.isValid() && !settings::STEPPED) {
         Player* plr = PlayerManager::getPlayer(src.sock);
 
         Items::DropRoll rolled;

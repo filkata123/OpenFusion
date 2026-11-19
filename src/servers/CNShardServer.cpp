@@ -4,6 +4,7 @@
 #include "core/CNShared.hpp"
 #include "db/Database.hpp"
 #include "servers/Monitor.hpp"
+#include "servers/Stepped.hpp"
 
 #include "PlayerManager.hpp"
 #include "MobAI.hpp"
@@ -29,10 +30,16 @@ CNShardServer::CNShardServer(uint16_t p) {
 
     if (settings::MONITORENABLED)
         fds.push_back({Monitor::init(), POLLIN});
+
+    if (settings::STEPPED) {
+        controlListener = Stepped::initListener();
+        fds.push_back({controlListener, POLLIN});
+    }
 }
 
 void CNShardServer::handlePacket(CNSocket* sock, CNPacketData* data) {
     printPacket(data);
+    Stepped::packetsProcessed++;
 
     // if it's a valid packet
     if (ShardPackets.find(data->type) != ShardPackets.end()) {
@@ -107,6 +114,8 @@ void CNShardServer::periodicItemExpireTimer(CNServer* serv, time_t currTime) {
 }
 
 bool CNShardServer::checkExtraSockets(int i) {
+    if (settings::STEPPED && handleControlSocket(i))
+        return true;
     return Monitor::acceptConnection(fds[i].fd, fds[i].revents);
 }
 
@@ -134,6 +143,10 @@ void CNShardServer::kill() {
 }
 
 void CNShardServer::onStep() {
+    // in stepped mode the timers only run inside a Control Channel STEP
+    if (settings::STEPPED)
+        return;
+
     time_t currTime = getTime();
 
     // do not evaluate timers if the server is shutting down

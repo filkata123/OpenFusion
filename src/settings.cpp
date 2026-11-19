@@ -68,6 +68,16 @@ int settings::MONITORPORT = 8003;
 std::string settings::MONITORLISTENIP = "127.0.0.1";
 int settings::MONITORINTERVAL = 5000;
 
+// Stepped mode for the ff-agent experiments: a virtual clock advanced only through the
+// Control Channel, plus atomic Episode resets. See src/servers/Stepped.hpp.
+bool settings::STEPPED = false;
+int settings::STEPPEDPORT = 8004;
+std::string settings::STEPPEDLISTENIP = "127.0.0.1";
+int settings::STEPPEDARENAMAP = 9000; // a map number with no NPCs, so arena instances start empty
+int settings::STEPPEDARENAX = 300000;
+int settings::STEPPEDARENAY = 300000;
+int settings::STEPPEDARENAZ = 0;
+
 // event mode settings
 int settings::EVENTMODE = 0;
 
@@ -144,6 +154,13 @@ void settings::init() {
     MONITORPORT = reader.GetInteger("monitor", "port", MONITORPORT);
     MONITORLISTENIP = reader.Get("monitor", "listenip", MONITORLISTENIP);
     MONITORINTERVAL = reader.GetInteger("monitor", "interval", MONITORINTERVAL);
+    STEPPED = reader.GetBoolean("stepped", "enabled", STEPPED);
+    STEPPEDPORT = reader.GetInteger("stepped", "port", STEPPEDPORT);
+    STEPPEDLISTENIP = reader.Get("stepped", "listenip", STEPPEDLISTENIP);
+    STEPPEDARENAMAP = reader.GetInteger("stepped", "arenamap", STEPPEDARENAMAP);
+    STEPPEDARENAX = reader.GetInteger("stepped", "arenax", STEPPEDARENAX);
+    STEPPEDARENAY = reader.GetInteger("stepped", "arenay", STEPPEDARENAY);
+    STEPPEDARENAZ = reader.GetInteger("stepped", "arenaz", STEPPEDARENAZ);
 
     if (DROPFIXESENABLED) {
         std::cout << "[INFO] Drop fixes enabled" << std::endl;

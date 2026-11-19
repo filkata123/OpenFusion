@@ -897,9 +897,16 @@ static void projectileHit(CNSocket* sock, CNPacketData* data) {
     PlayerManager::sendToViewable(sock, (void*)respbuf, P_FE2CL_PC_GRENADE_STYLE_HIT, resplen);
 }
 
+// file-scope so that stepped mode can re-phase them at an Episode reset
+static time_t lastHealTime = 0;
+static time_t lastCombatTIme = 0;
+
+void Combat::resetTickPhase(time_t now) {
+    lastHealTime = now;
+    lastCombatTIme = now;
+}
+
 static void playerTick(CNServer *serv, time_t currTime) {
-    static time_t lastHealTime = 0;
-    static time_t lastCombatTIme = 0;
 
     for (auto& pair : PlayerManager::players) {
         CNSocket *sock = pair.first;

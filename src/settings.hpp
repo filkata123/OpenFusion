@@ -43,6 +43,13 @@ namespace settings {
     extern int MONITORPORT;
     extern std::string MONITORLISTENIP;
     extern int MONITORINTERVAL;
+    extern bool STEPPED;
+    extern int STEPPEDPORT;
+    extern std::string STEPPEDLISTENIP;
+    extern int STEPPEDARENAMAP;
+    extern int STEPPEDARENAX;
+    extern int STEPPEDARENAY;
+    extern int STEPPEDARENAZ;
     extern bool DISABLEFIRSTUSEFLAG;
     extern bool IZRACESCORECAPPED;
     extern bool DROPFIXESENABLED;

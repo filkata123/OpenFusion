@@ -16,6 +16,7 @@
 #include "TableData.hpp"
 #include "Groups.hpp"
 #include "servers/Monitor.hpp"
+#include "servers/Stepped.hpp"
 #include "Racing.hpp"
 #include "Trading.hpp"
 #include "Email.hpp"
@@ -207,6 +208,9 @@ size_t U8toU16(std::string src, char16_t* des, size_t max) {
 
 time_t getTime() {
     using namespace std::chrono;
+
+    if (settings::STEPPED)
+        return Stepped::now(); // virtual clock, advanced only by the Control Channel
 
     milliseconds value = duration_cast<milliseconds>((time_point_cast<milliseconds>(steady_clock::now())).time_since_epoch());
 

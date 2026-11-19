@@ -43,6 +43,7 @@ CXXSRC=\
 	src/servers/CNLoginServer.cpp\
 	src/servers/CNShardServer.cpp\
 	src/servers/Monitor.cpp\
+	src/servers/Stepped.cpp\
 	src/db/init.cpp\
 	src/db/login.cpp\
 	src/db/shard.cpp\
@@ -89,6 +90,7 @@ CXXHDR=\
 	src/servers/CNLoginServer.hpp\
 	src/servers/CNShardServer.hpp\
 	src/servers/Monitor.hpp\
+	src/servers/Stepped.hpp\
 	src/db/Database.hpp\
 	src/db/internal.hpp\
 	src/sandbox/Sandbox.hpp\

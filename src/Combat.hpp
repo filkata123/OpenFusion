@@ -19,5 +19,6 @@ namespace Combat {
     void init();
 
     void npcAttackPc(Mob *mob, time_t currTime);
+    void resetTickPhase(time_t now);
     void genQItemRolls(std::vector<Player*> players, std::map<int, int>& rolls);
 }
