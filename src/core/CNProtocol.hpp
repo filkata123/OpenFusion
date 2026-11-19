@@ -183,6 +183,7 @@ public:
     SOCKET sock;
     sockaddr_in sockaddr;
     PacketHandler pHandler;
+    uint64_t packetsSent = 0; // packets successfully written to this socket
 
     CNSocket(SOCKET s, struct sockaddr_in &addr, PacketHandler ph);
 

@@ -10,12 +10,15 @@
  *
  *   PING
  *   TIME                    -> OK <virtual ms>
- *   COUNT                   -> OK <shard packets processed since start>
+ *   COUNT                   -> OK <client packets processed> <packets sent to the player>
  *   SEED <u64>              reseed the global RNG
  *   STEP <ticks> <count>    first process client packets until <count> shard packets have
  *                           been handled, then for each tick advance the clock 100 ms and
  *                           run the due timers. Packets go out as they are produced.
- *                           -> OK <virtual ms> <count>
+ *                           -> OK <virtual ms> <client packets processed> <packets sent to the player>
+ *                                 <sent after handling the client packets> <sent after Tick 1> ...
+ *                           The harness reads the game socket until it has received that many, and
+ *                           the per-Tick marks tell it which Tick each packet came from.
  *   RESET <seed> <slot> <mobType> <n> <dx1> <dy1> ... <dxn> <dyn>
  *                           atomic Episode reset for the one connected player: warp to the
  *                           Arena centre in a fresh private instance (the previous one, with
@@ -24,7 +27,7 @@
  *                           <slot>, spawn n summoned mobs as one group at the given offsets
  *                           from the centre (the first is the leader), reseed the RNG and
  *                           re-phase the timers so they count from the reset.
- *                           -> OK <virtual ms>
+ *                           -> OK <virtual ms> <packets sent to the player>
  *   STATE                   privileged dump of the player and the mobs in its instance,
  *                           for tests and Twin Gap diagnostics only. Never for an acting
  *                           policy (ff-agent ADR 0001).

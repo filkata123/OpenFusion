@@ -179,6 +179,9 @@ void CNSocket::sendPacket(void* buf, uint32_t type, size_t size) {
     // send packet data!
     if (alive && !sendData(fullpkt, bodysize+4))
         kill();
+    else if (alive)
+        packetsSent++; // lets the stepped-mode harness know when it has read everything
+
 }
 
 void CNSocket::setActiveKey(ACTIVEKEY key) {

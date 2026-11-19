@@ -62,6 +62,13 @@ static void closeSocket(SOCKET s) {
 #endif
 }
 
+// Packets the server has sent to the one player's socket so far (0 without a player).
+static uint64_t playerPacketsSent() {
+    if (PlayerManager::players.size() != 1)
+        return 0;
+    return PlayerManager::players.begin()->first->packetsSent;
+}
+
 static bool sendAll(SOCKET s, const std::string& msg) {
     size_t n = 0;
     while (n < msg.size()) {
@@ -132,7 +139,7 @@ std::string CNShardServer::handleControlCommand(const std::string& line) {
     if (cmd == "TIME")
         return "OK " + std::to_string(Stepped::now());
     if (cmd == "COUNT")
-        return "OK " + std::to_string(Stepped::packetsProcessed.load());
+        return "OK " + std::to_string(Stepped::packetsProcessed.load()) + " " + std::to_string(playerPacketsSent());
     if (cmd == "SEED") {
         uint64_t seed;
         if (!(in >> seed))
@@ -209,12 +216,16 @@ std::string CNShardServer::stepTicks(int ticks, uint64_t target) {
         return "ERR timed out waiting for client packets (have " + std::to_string(Stepped::packetsProcessed.load())
             + ", want " + std::to_string(target) + ")";
 
+    // marks[0]: packets sent once the client's packets were handled; marks[k]: after Tick k
+    std::string marks = " " + std::to_string(playerPacketsSent());
     for (int k = 0; k < ticks; k++) {
         Stepped::virtualTime += Stepped::TICK_MS;
         std::lock_guard<std::mutex> lock(activeCrit);
         runTimers(Stepped::now());
+        marks += " " + std::to_string(playerPacketsSent());
     }
-    return "OK " + std::to_string(Stepped::now()) + " " + std::to_string(Stepped::packetsProcessed.load());
+    return "OK " + std::to_string(Stepped::now()) + " " + std::to_string(Stepped::packetsProcessed.load())
+        + " " + std::to_string(playerPacketsSent()) + marks;
 }
 
 std::string CNShardServer::resetEpisode(std::istringstream& in) {
@@ -296,7 +307,7 @@ std::string CNShardServer::resetEpisode(std::istringstream& in) {
         event.scheduledEvent = now + event.delta;
     Combat::resetTickPhase(now);
 
-    return "OK " + std::to_string(now);
+    return "OK " + std::to_string(now) + " " + std::to_string(playerPacketsSent());
 }
 
 static int aiStateCode(AIState s) {
