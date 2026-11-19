@@ -380,7 +380,17 @@ void NPCManager::queueNPCRemoval(int32_t id) {
 }
 
 static void step(CNServer *serv, time_t currTime) {
-    for (auto& pair : NPCs) {
+    if (settings::STEPPED) {
+        // Stepped mode: a defined order (spawn order, i.e. descending id) instead of hash
+        // order, so a Twin can step its mobs in the same order (ff-agent ADR 0005).
+        std::vector<CombatNPC*> order;
+        for (auto& pair : NPCs)
+            if (pair.second->kind == EntityKind::COMBAT_NPC || pair.second->kind == EntityKind::MOB)
+                order.push_back((CombatNPC*)pair.second);
+        std::sort(order.begin(), order.end(), [](CombatNPC* a, CombatNPC* b) { return a->id > b->id; });
+        for (CombatNPC* npc : order)
+            npc->step(currTime);
+    } else for (auto& pair : NPCs) {
         if (pair.second->kind != EntityKind::COMBAT_NPC && pair.second->kind != EntityKind::MOB)
             continue;
         auto npc = (CombatNPC*)pair.second;
