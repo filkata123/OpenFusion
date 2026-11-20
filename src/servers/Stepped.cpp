@@ -267,6 +267,7 @@ std::string CNShardServer::resetEpisode(std::istringstream& in) {
     plr->batteryW = 0;
     plr->batteryN = 0;
     plr->healCooldown = 0;
+    plr->inCombat = false; // the Real Client starts out of combat mode (ff-agent #26)
     plr->suspicionRating = 0;
     plr->lastShot = 0;
     plr->clearBuffs(true);
@@ -334,6 +335,7 @@ std::string CNShardServer::dumpState() {
     out << " hp=" << plr->HP << " x=" << plr->x << " y=" << plr->y << " active=" << activeSlot << " stamina=";
     for (int i = 0; i < 3; i++)
         out << (i ? "," : "") << plr->Nanos[plr->equippedNanos[i]].iStamina;
+    out << " combat=" << (plr->inCombat ? 1 : 0) << " healcd=" << plr->healCooldown;
 
     // mobs in the player's instance, sorted by id for a stable order
     std::vector<Mob*> mobs;
