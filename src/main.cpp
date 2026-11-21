@@ -209,7 +209,7 @@ size_t U8toU16(std::string src, char16_t* des, size_t max) {
 time_t getTime() {
     using namespace std::chrono;
 
-    if (settings::STEPPED)
+    if (settings::STEPPED && !settings::STEPPEDWALL)
         return Stepped::now(); // virtual clock, advanced only by the Control Channel
 
     milliseconds value = duration_cast<milliseconds>((time_point_cast<milliseconds>(steady_clock::now())).time_since_epoch());

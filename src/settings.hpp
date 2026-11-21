@@ -44,6 +44,7 @@ namespace settings {
     extern std::string MONITORLISTENIP;
     extern int MONITORINTERVAL;
     extern bool STEPPED;
+    extern bool STEPPEDWALL;
     extern int STEPPEDPORT;
     extern std::string STEPPEDLISTENIP;
     extern int STEPPEDARENAMAP;

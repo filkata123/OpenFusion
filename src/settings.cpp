@@ -71,6 +71,8 @@ int settings::MONITORINTERVAL = 5000;
 // Stepped mode for the ff-agent experiments: a virtual clock advanced only through the
 // Control Channel, plus atomic Episode resets. See src/servers/Stepped.hpp.
 bool settings::STEPPED = false;
+// [stepped] clock=wall: keep the Control Channel's RESET/STATE but run the unmodified wall clock
+bool settings::STEPPEDWALL = false;
 int settings::STEPPEDPORT = 8004;
 std::string settings::STEPPEDLISTENIP = "127.0.0.1";
 int settings::STEPPEDARENAMAP = 9000; // a map number with no NPCs, so arena instances start empty
@@ -155,6 +157,7 @@ void settings::init() {
     MONITORLISTENIP = reader.Get("monitor", "listenip", MONITORLISTENIP);
     MONITORINTERVAL = reader.GetInteger("monitor", "interval", MONITORINTERVAL);
     STEPPED = reader.GetBoolean("stepped", "enabled", STEPPED);
+    STEPPEDWALL = reader.Get("stepped", "clock", "virtual") == "wall";
     STEPPEDPORT = reader.GetInteger("stepped", "port", STEPPEDPORT);
     STEPPEDLISTENIP = reader.Get("stepped", "listenip", STEPPEDLISTENIP);
     STEPPEDARENAMAP = reader.GetInteger("stepped", "arenamap", STEPPEDARENAMAP);

@@ -137,7 +137,7 @@ std::string CNShardServer::handleControlCommand(const std::string& line) {
     if (cmd == "PING")
         return "OK";
     if (cmd == "TIME")
-        return "OK " + std::to_string(Stepped::now());
+        return "OK " + std::to_string(getTime());
     if (cmd == "COUNT")
         return "OK " + std::to_string(Stepped::packetsProcessed.load()) + " " + std::to_string(playerPacketsSent());
     if (cmd == "SEED") {
@@ -148,6 +148,8 @@ std::string CNShardServer::handleControlCommand(const std::string& line) {
         return "OK";
     }
     if (cmd == "STEP") {
+        if (settings::STEPPEDWALL)
+            return "ERR STEP needs clock=virtual (this server runs the wall clock)";
         int ticks;
         uint64_t target;
         if (!(in >> ticks >> target) || ticks < 0)
@@ -251,7 +253,7 @@ std::string CNShardServer::resetEpisode(std::istringstream& in) {
     std::lock_guard<std::mutex> lock(activeCrit);
     CNSocket* sock = PlayerManager::players.begin()->first;
     Player* plr = PlayerManager::players.begin()->second;
-    time_t now = Stepped::now();
+    time_t now = getTime();
 
     // Fresh private instance. Alternating between two map numbers means the warp always
     // leaves the previous instance, which is then destroyed with any leftover mobs.
@@ -303,10 +305,13 @@ std::string CNShardServer::resetEpisode(std::istringstream& in) {
     }
 
     // Seed and re-phase: timers count from the reset, the player tick before the mob tick.
+    // With clock=wall the timers keep their own phase, as on an unmodified server.
     Rand::init(seed);
-    for (TimerEvent& event : Timers)
-        event.scheduledEvent = now + event.delta;
-    Combat::resetTickPhase(now);
+    if (!settings::STEPPEDWALL) {
+        for (TimerEvent& event : Timers)
+            event.scheduledEvent = now + event.delta;
+        Combat::resetTickPhase(now);
+    }
 
     return "OK " + std::to_string(now) + " " + std::to_string(playerPacketsSent());
 }
@@ -323,7 +328,7 @@ static int aiStateCode(AIState s) {
 
 std::string CNShardServer::dumpState() {
     std::ostringstream out;
-    out << "OK t=" << Stepped::now();
+    out << "OK t=" << getTime();
     if (PlayerManager::players.size() != 1)
         return out.str() + " players=" + std::to_string(PlayerManager::players.size());
 

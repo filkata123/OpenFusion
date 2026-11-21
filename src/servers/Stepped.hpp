@@ -4,7 +4,9 @@
  * Stepped mode for the ff-agent experiments (ff-agent ADR 0005).
  *
  * With [stepped] enabled=true, getTime() returns a virtual clock that only the Control
- * Channel advances. The Control Channel is a line-based text protocol on a separate TCP
+ * Channel advances. With clock=wall as well, the clock and the timers are the unmodified
+ * server's (real time, timers in the poll loop); RESET, STATE and the rest still work, STEP
+ * is refused, and RESET leaves the timer phases alone (ff-agent #30, real-time validation). The Control Channel is a line-based text protocol on a separate TCP
  * port (one client at a time). The agent's game connection carries only packets a Real
  * Client would send. Commands, each answered with one line starting "OK" or "ERR":
  *

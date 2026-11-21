@@ -143,8 +143,8 @@ void CNShardServer::kill() {
 }
 
 void CNShardServer::onStep() {
-    // in stepped mode the timers only run inside a Control Channel STEP
-    if (settings::STEPPED)
+    // in stepped mode the timers only run inside a Control Channel STEP (clock=wall: here, as usual)
+    if (settings::STEPPED && !settings::STEPPEDWALL)
         return;
 
     time_t currTime = getTime();
