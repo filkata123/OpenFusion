@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string>
 #include <time.h>
+#include <vector>
 
 namespace settings {
     extern int VERBOSITY;
@@ -51,6 +52,7 @@ namespace settings {
     extern int STEPPEDARENAX;
     extern int STEPPEDARENAY;
     extern int STEPPEDARENAZ;
+    extern std::vector<int> STEPPEDMOBTICKS;
     extern bool DISABLEFIRSTUSEFLAG;
     extern bool IZRACESCORECAPPED;
     extern bool DROPFIXESENABLED;

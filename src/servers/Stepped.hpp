@@ -54,5 +54,9 @@ namespace Stepped {
 
     inline time_t now() { return (time_t)virtualTime.load(); }
 
+    // The mob step timer's next period in ms, from [stepped] mobticks (repeating). `restart`
+    // starts the pattern over (at RESET).
+    time_t nextMobTickMs(bool restart = false);
+
     SOCKET initListener();
 }

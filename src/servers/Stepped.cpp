@@ -21,6 +21,21 @@
 std::atomic<int64_t> Stepped::virtualTime{Stepped::START_TIME};
 std::atomic<uint64_t> Stepped::packetsProcessed{0};
 
+time_t Stepped::nextMobTickMs(bool restart) {
+    static size_t i = 0;
+    if (restart)
+        i = 0;
+    const std::vector<int>& p = settings::STEPPEDMOBTICKS;
+    time_t ms = (time_t)p[i % p.size()] * TICK_MS;
+    i++;
+    return ms;
+}
+
+// The NPC step timer is the only one registered with MS_PER_COMBAT_TICK (NPCManager.cpp).
+static bool isMobTimer(const TimerEvent& event) {
+    return event.delta == MS_PER_COMBAT_TICK;
+}
+
 SOCKET Stepped::initListener() {
     SOCKET listener = socket(AF_INET, SOCK_STREAM, 0);
     if (SOCKETERROR(listener)) {
@@ -208,7 +223,7 @@ void CNShardServer::runTimers(time_t currTime) {
         }
         if (event.scheduledEvent <= currTime) {
             event.handlr(this, currTime);
-            event.scheduledEvent = currTime + event.delta;
+            event.scheduledEvent = currTime + (isMobTimer(event) ? Stepped::nextMobTickMs() : event.delta);
         }
     }
 }
@@ -308,8 +323,9 @@ std::string CNShardServer::resetEpisode(std::istringstream& in) {
     // With clock=wall the timers keep their own phase, as on an unmodified server.
     Rand::init(seed);
     if (!settings::STEPPEDWALL) {
+        Stepped::nextMobTickMs(true);
         for (TimerEvent& event : Timers)
-            event.scheduledEvent = now + event.delta;
+            event.scheduledEvent = now + (isMobTimer(event) ? Stepped::nextMobTickMs() : event.delta);
         Combat::resetTickPhase(now);
     }
 

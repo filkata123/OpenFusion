@@ -4,6 +4,7 @@
 #include "core/CNStructs.hpp" // so we get the ACADEMY definition
 #include "INIReader.hpp"
 
+#include <cstdlib>
 #include <iostream>
 
 // defaults :)
@@ -79,6 +80,10 @@ int settings::STEPPEDARENAMAP = 9000; // a map number with no NPCs, so arena ins
 int settings::STEPPEDARENAX = 300000;
 int settings::STEPPEDARENAY = 300000;
 int settings::STEPPEDARENAZ = 0;
+// [stepped] mobticks: the mob step timer's period in 100 ms Ticks, as a repeating pattern
+// (virtual clock only). "2" is the server's 200 ms; "2,3" alternates 200 and 300 ms (250 ms
+// on average: what an agent sending every 200 ms meets on an unmodified server, ff-agent ADR 0018).
+std::vector<int> settings::STEPPEDMOBTICKS = {2};
 
 // event mode settings
 int settings::EVENTMODE = 0;
@@ -164,6 +169,24 @@ void settings::init() {
     STEPPEDARENAX = reader.GetInteger("stepped", "arenax", STEPPEDARENAX);
     STEPPEDARENAY = reader.GetInteger("stepped", "arenay", STEPPEDARENAY);
     STEPPEDARENAZ = reader.GetInteger("stepped", "arenaz", STEPPEDARENAZ);
+    {
+        std::string ticks = reader.Get("stepped", "mobticks", "2");
+        std::vector<int> pattern;
+        size_t start = 0;
+        while (start <= ticks.size()) {
+            size_t end = ticks.find(',', start);
+            if (end == std::string::npos)
+                end = ticks.size();
+            int n = std::atoi(ticks.substr(start, end - start).c_str());
+            if (n <= 0) {
+                std::cerr << "[FATAL] [stepped] mobticks must be positive Tick counts: " << ticks << std::endl;
+                exit(1);
+            }
+            pattern.push_back(n);
+            start = end + 1;
+        }
+        STEPPEDMOBTICKS = pattern;
+    }
 
     if (DROPFIXESENABLED) {
         std::cout << "[INFO] Drop fixes enabled" << std::endl;
