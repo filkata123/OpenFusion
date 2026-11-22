@@ -23,8 +23,10 @@ std::atomic<uint64_t> Stepped::packetsProcessed{0};
 
 time_t Stepped::nextMobTickMs(bool restart) {
     static size_t i = 0;
-    if (restart)
+    if (restart) {
         i = 0;
+        return 0;
+    }
     const std::vector<int>& p = settings::STEPPEDMOBTICKS;
     time_t ms = (time_t)p[i % p.size()] * TICK_MS;
     i++;
